@@ -63,6 +63,29 @@ local function getSelectedAHItemId()
     return itemId
 end
 
+local allowed_items = {
+    ["11737"]=1, -- Libram of Voracity
+    ["18333"]=1, -- Libram of Focus
+    ["18332"]=1, -- Libram of Rapidity
+    ["11733"]=1, -- Libram of Constitution
+    ["11736"]=1, -- Libram of Resilience
+    ["11732"]=1, -- Libram of Rumination
+    ["18334"]=1, -- Libram of Protection
+    ["11734"]=1, -- Libram of Tenacity
+    ["8391"]=1, -- Snickerfang Jowl
+    ["8392"]=1, -- Blasted Board Lung
+    ["8393"]=1, -- Scorpok Pincer
+    ["8394"]=1, -- Basilisk Brain
+    ["8396"]=1, -- Vulture Gizzard
+    ["12430"]=1, -- Frostsaber E'ko
+    ["12431"]=1, -- Winterfall E'ko
+    ["12432"]=1, -- Shardtooth E'ko
+    ["12433"]=1, -- Wildkin E'ko
+    ["12434"]=1, -- Chillwind E'ko
+    ["12435"]=1, -- Ice Thistle E'ko
+    ["12436"]=1, -- Frostmaul E'ko
+}
+
 local function canBuyItem(itemId)
     if CanEditOfficerNote() == true then
         return true
@@ -78,6 +101,11 @@ local function canBuyItem(itemId)
         print("|cFFFF0000[OnlyFangs] BLOCKED:|r Flask of Petrification can't be bought from the auction house.")
         return false
     end
+
+    if allowed_items[tostring(itemId)] then
+        return true
+    end
+
     -- allow Potions, Tradegoods and Reagents
     if classID == Enum.ItemClass.Consumable then
         return true
@@ -88,16 +116,15 @@ local function canBuyItem(itemId)
     if classID == Enum.ItemClass.Reagent then
         return true
     end
-    if classID == Enum.ItemClass.Questitem then
+    if classID == Enum.ItemClass.Projectile then
         return true
     end
-    if classID == Enum.ItemClass.Miscellaneous then
+    if classID == Enum.ItemClass.Container then
         return true
-    end
-
+    end 
 
     -- everything else is disallowed
-    print("|cFFFF0000[OnlyFangs] BLOCKED:|r Only Consumables, Reagents and Tradegoods may be purchased from the auction house.")
+    print("|cFFFF0000[OnlyFangs] BLOCKED:|r Only Consumables, Reagents and Tradegoods, Projectiles, and Containers may be purchased from the auction house.")
     return false
 end
 
@@ -189,16 +216,15 @@ rule_event_handler:SetScript("OnEvent", function(self, event, ...)
 
             if AuctionatorBuyFrame and 
             AuctionatorBuyFrame.CurrentPrices and 
-            AuctionatorBuyFrame.CurrentPrices.BuyDialog and
-            AuctionatorBuyFrame.CurrentPrices.BuyDialog.BuyStack then
-                local originalAuctionatorBuyStackOnClick = AuctionatorBuyFrame.CurrentPrices.BuyDialog.BuyStack:GetScript("OnClick")
+            AuctionatorBuyFrame.CurrentPrices.BuyButton then
+                local originalAuctionatorBuyOnClick = AuctionatorBuyFrame.CurrentPrices.BuyButton:GetScript("OnClick")
 
-                AuctionatorBuyFrame.CurrentPrices.BuyDialog.BuyStack:SetScript("OnClick", function(self, button, down)
-                    local itemLink = AuctionatorBuyFrame.CurrentPrices.BuyDialog.auctionData.itemLink
+                AuctionatorBuyFrame.CurrentPrices.BuyButton:SetScript("OnClick", function(self, button, down)
+                    local itemLink = AuctionatorBuyFrame.CurrentPrices.selectedAuctionData.itemLink
                     local itemId = tonumber(select(3, strfind(itemLink, "item:(%d+)")))
     
                     if canBuyItem(itemId) then
-                        originalAuctionatorBuyStackOnClick(self, button, down)
+                        originalAuctionatorBuyOnClick(self, button, down)
                     end
                 end)
             end
