@@ -49,12 +49,7 @@ rule_event_handler:RegisterEvent("MAIL_SHOW")
 rule_event_handler:RegisterEvent("MAIL_INBOX_UPDATE")
 rule_event_handler:RegisterEvent("AUCTION_HOUSE_SHOW")
 
-local function canBuyItem()
-    if CanEditOfficerNote() == true then
-        return true
-    end
-
-
+local function getSelectedAHItemId()
     local index = GetSelectedAuctionItem(AuctionFrame.type)
     local name, texture, count, quality, canUse, level, levelColHeader,
     minBid, minIncrement, buyoutPrice, bidAmount, highBidder,
@@ -62,6 +57,18 @@ local function canBuyItem()
     GetAuctionItemInfo(AuctionFrame.type, index)
 
     if not hasAllInfo then
+        return nil
+    end
+
+    return itemId
+end
+
+local function canBuyItem(itemId)
+    if CanEditOfficerNote() == true then
+        return true
+    end
+
+    if not itemId then
         return false
     end
 
@@ -81,6 +88,13 @@ local function canBuyItem()
     if classID == Enum.ItemClass.Reagent then
         return true
     end
+    if classID == Enum.ItemClass.Questitem then
+        return true
+    end
+    if classID == Enum.ItemClass.Miscellaneous then
+        return true
+    end
+
 
     -- everything else is disallowed
     print("|cFFFF0000[OnlyFangs] BLOCKED:|r Only Consumables, Reagents and Tradegoods may be purchased from the auction house.")
@@ -112,7 +126,6 @@ local common_auction_addons = {
     ["tdauction"]=1,
     ["tradeskillmaster"]=1,
     ["alatrade"]=1,
-    ["auctionator"]=1,
     ["auctionbuddy"]=1,
     ["auctionfaster"]=1,
     ["auctionlite-classic"]=1,
@@ -161,16 +174,34 @@ rule_event_handler:SetScript("OnEvent", function(self, event, ...)
             local originalBidOnClick = BrowseBidButton:GetScript("OnClick")
 
             BrowseBuyoutButton:SetScript("OnClick", function(self, button, down)
-                if canBuyItem() then
+                local itemId = getSelectedAHItemId()
+                if canBuyItem(itemId) then
                     originalBuyoutOnClick(self, button, down)
                 end
             end)
 
             BrowseBidButton:SetScript("OnClick", function(self, button, down)
-                if canBuyItem() then
+                local itemId = getSelectedAHItemId()
+                if canBuyItem(itemId) then
                     originalBidOnClick(self, button, down)
                 end
             end)
+
+            if AuctionatorBuyFrame and 
+            AuctionatorBuyFrame.CurrentPrices and 
+            AuctionatorBuyFrame.CurrentPrices.BuyDialog and
+            AuctionatorBuyFrame.CurrentPrices.BuyDialog.BuyStack then
+                local originalAuctionatorBuyStackOnClick = AuctionatorBuyFrame.CurrentPrices.BuyDialog.BuyStack:GetScript("OnClick")
+
+                AuctionatorBuyFrame.CurrentPrices.BuyDialog.BuyStack:SetScript("OnClick", function(self, button, down)
+                    local itemLink = AuctionatorBuyFrame.CurrentPrices.BuyDialog.auctionData.itemLink
+                    local itemId = tonumber(select(3, strfind(itemLink, "item:(%d+)")))
+    
+                    if canBuyItem(itemId) then
+                        originalAuctionatorBuyStackOnClick(self, button, down)
+                    end
+                end)
+            end
         end
     end
 end)
