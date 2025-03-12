@@ -84,6 +84,7 @@ local allowed_items = {
     ["12434"]=1, -- Chillwind E'ko
     ["12435"]=1, -- Ice Thistle E'ko
     ["12436"]=1, -- Frostmaul E'ko
+    ["20520"]=1, -- Dark Rune
 }
 
 local function canBuyItem(itemId)
@@ -232,6 +233,28 @@ rule_event_handler:SetScript("OnEvent", function(self, event, ...)
     end
 end)
 
+local tradeable_items = {
+    ["Conjured Crystal Water"]=1,
+    ["Conjured Sparkling Water"]=1,
+    ["Conjured Mineral Water"]=1,
+    ["Conjured Spring Water"]=1,
+    ["Conjured Purified Water"]=1,
+    ["Conjured Fresh Water"]=1,
+    ["Conjured Water"]=1,
+    ["Conjured Cinnamon Roll"]=1,
+    ["Conjured Sweet Roll"]=1,
+    ["Conjured Sourdough"]=1,
+    ["Conjured Pumpernickel"]=1,
+    ["Conjured Rye"]=1,
+    ["Conjured Bread"]=1,
+    ["COnjured Muffin"]=1,
+    ["Major Healthstone"]=1,
+    ["Greater Healthstone"]=1,
+    ["Healthstone"]=1,
+    ["Lesser Healthstone"]=1,
+    ["Minor Healthstone"]=1,
+}
+
 local function notReceivingItems()
     local _money = GetTargetTradeMoney()
     if _money ~= 0 then
@@ -240,7 +263,7 @@ local function notReceivingItems()
     end
     for i = 1, 6 do
         local _item_name, texture, quantity, quality, isUsable, enchant = GetTradeTargetItemInfo(i)
-        if _item_name then
+        if _item_name and not tradeable_items[_item_name]then
             print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not receive items from outside of the guild.")
             return false
         end
