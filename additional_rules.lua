@@ -45,9 +45,9 @@ local on_mail_show = function()
     end
 end
 
-rule_event_handler:RegisterEvent("MAIL_SHOW")
-rule_event_handler:RegisterEvent("MAIL_INBOX_UPDATE")
-rule_event_handler:RegisterEvent("AUCTION_HOUSE_SHOW")
+-- rule_event_handler:RegisterEvent("MAIL_SHOW")
+-- rule_event_handler:RegisterEvent("MAIL_INBOX_UPDATE")
+-- rule_event_handler:RegisterEvent("AUCTION_HOUSE_SHOW")
 
 local function getSelectedAHItemId()
     local index = GetSelectedAuctionItem(AuctionFrame.type)
@@ -277,14 +277,14 @@ local function notReceivingItems()
     return true
 end
 
-TradeFrameTradeButton:SetScript("OnClick", function()
-    local target_trader = TradeFrameRecipientNameText:GetText()
-    if in_guild(target_trader) or notReceivingItems() or CanEditOfficerNote() then
-        AcceptTrade()
-    else
-        print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not trade outside of the guild.")
-    end
-end)
+-- TradeFrameTradeButton:SetScript("OnClick", function()
+--     local target_trader = TradeFrameRecipientNameText:GetText()
+--     if in_guild(target_trader) or notReceivingItems() or CanEditOfficerNote() then
+--         AcceptTrade()
+--     else
+--         print("|cFFFF0000[OnlyFangs] BLOCKED:|r You may not trade outside of the guild.")
+--     end
+-- end)
 
 -- local handler = CreateFrame("frame")
 -- handler:RegisterEvent("UNIT_TARGET")
@@ -293,15 +293,15 @@ end)
 -- 	print(in_guild(UnitName("target")))
 -- end)
 
-C_Timer.NewTicker(60, function(self)
-    for i = 1, 40 do
-        local buff_name, _, _, _, _, _, _, _, _, _, _ = UnitBuff("player", i)
-        if buff_name == nil then
-            return
-        end
-        if buff_name == "Spirit of Zandalar" then
-            CancelUnitBuff("player", i)
-            print("OnlyFangs: Removing buff " .. buff_name .. ".")
-        end
-    end
-end)
+-- C_Timer.NewTicker(60, function(self)
+--     for i = 1, 40 do
+--         local buff_name, _, _, _, _, _, _, _, _, _, _ = UnitBuff("player", i)
+--         if buff_name == nil then
+--             return
+--         end
+--         if buff_name == "Spirit of Zandalar" then
+--             CancelUnitBuff("player", i)
+--             print("OnlyFangs: Removing buff " .. buff_name .. ".")
+--         end
+--     end
+-- end)
